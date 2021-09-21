@@ -1,9 +1,37 @@
 import { isElementInPath, listenIfTrue } from '@/utils/dom'
 import { copyObject, minus } from '@/utils/fp'
-import { isClose } from '@/utils/functions'
-import { debounce, mapValues, mergeWith, omit, throttle } from 'lodash'
+import { isClose, valToP } from '@/utils/functions'
+import { clamp, debounce, mapValues, mergeWith, omit, throttle } from 'lodash'
 
 type SwipeDirection = 'up' | 'down' | 'left' | 'right'
+
+type EventType = 'swipe' | 'progress'
+
+type EventCallback = (details: {
+	type: EventType
+	direction: SwipeDirection
+	progress: number
+	distance: number
+	capedProgress: number
+	capedDistance: number
+}) => void
+
+type Unsubscribe = (
+	type: EventType,
+	direction: SwipeDirection,
+	handler: EventCallback,
+) => void
+
+type CookedUnsubscribe = () => void
+
+interface Subscribe {
+	(
+		type: EventType,
+		direction: SwipeDirection,
+		callback: EventCallback,
+	): CookedUnsubscribe
+	(type: EventType, callback: EventCallback): CookedUnsubscribe
+}
 
 interface Position {
 	top: number
@@ -15,6 +43,11 @@ interface Position {
 interface Bounds extends Position {
 	width: number
 	height: number
+}
+
+interface ReturnValue {
+	on: Subscribe
+	off: Unsubscribe
 }
 
 //
@@ -85,15 +118,22 @@ const getBoundsReached = (
 export default function detectSwipe(
 	el: HTMLElement,
 	container: HTMLElement | Window = window,
-) {
+): ReturnValue {
 	//
 	// Data:
-	const listeners: Function[] = []
+	const distanceThreshold = 250
+
+	const privateListeners: Function[] = []
+	let publicListeners: {
+		type: EventType
+		direction: SwipeDirection
+		handler: EventCallback
+	}[] = []
 
 	let _onScreen = false,
 		_allowSides = getDefaultAllow(),
 		_allowSwipe = false,
-		_progress = 0,
+		_distance = 0,
 		_swiping: SwipeDirection | null = null,
 		_swiped: SwipeDirection | null = null,
 		_lastTouch = { x: 0, y: 0, timestamp: 0 }
@@ -107,7 +147,40 @@ export default function detectSwipe(
 	)
 
 	//
-	// Local Actions:
+	// Public Actions:
+
+	const off: Unsubscribe = (
+		type: EventType,
+		direction: SwipeDirection,
+		handler: EventCallback,
+	): void => {
+		publicListeners = publicListeners.filter(
+			i =>
+				i.type !== type ||
+				i.direction !== direction ||
+				i.handler !== handler,
+		)
+	}
+
+	const on = (
+		type: EventType,
+		a: SwipeDirection | EventCallback,
+		b?: EventCallback,
+	): CookedUnsubscribe => {
+		if (typeof a === 'function') {
+			const handler = a as EventCallback
+			const directions: SwipeDirection[] = ['up', 'down', 'left', 'right']
+			const offs = directions.map(direction => on(type, direction, handler))
+			return () => offs.forEach(f => f())
+		}
+		const direction = a
+		const handler = b as EventCallback
+		publicListeners.push({ type, direction, handler })
+		return () => off(type, direction, handler)
+	}
+
+	//
+	// Private Actions:
 
 	const isVisible = () => _onScreen
 
@@ -117,12 +190,33 @@ export default function detectSwipe(
 		options?: boolean | AddEventListenerOptions,
 	) => {
 		const stop = listenIfTrue(container, isVisible, type, callback, options)
-		listeners.push(stop)
+		privateListeners.push(stop)
+	}
+
+	const emit = (type: EventType, direction: SwipeDirection): void => {
+		const progress = valToP(_distance, 0, distanceThreshold),
+			capedProgress = clamp(progress, 0, 1),
+			capedDistance = clamp(_distance, 0, distanceThreshold)
+		publicListeners.forEach(
+			i =>
+				i.type === type &&
+				i.direction === direction &&
+				i.handler({
+					type,
+					direction,
+					progress,
+					distance: _distance,
+					capedProgress,
+					capedDistance,
+				}),
+		)
 	}
 
 	const triggerSwipe = () => {
+		if (!_swiping) return
 		_swiped = _swiping
 		console.log('SWIPE', _swiping)
+		emit('swipe', _swiped)
 
 		setTimeout(() => resetState(true), 500)
 	}
@@ -130,7 +224,7 @@ export default function detectSwipe(
 	const resetState = (setAllowed = false) => {
 		_swiping = null
 		_swiped = null
-		_progress = 0
+		_distance = 0
 		if (!setAllowed) return
 		const relPoz = relativePosition(el, container),
 			boundsReached = getBoundsReached(relPoz, 50)
@@ -139,7 +233,7 @@ export default function detectSwipe(
 
 	const progressSwipe = (
 		direction: SwipeDirection,
-		progress: number,
+		distance: number,
 		e?: Event,
 	) => {
 		if (
@@ -149,15 +243,17 @@ export default function detectSwipe(
 		)
 			return resetState()
 
-		_progress += progress
+		_distance += distance
 		if (!_swiping) {
 			_swiping = direction
 			_allowSides = getDefaultAllow()
 		}
 		if (e?.cancelable) e.preventDefault()
+
+		emit('progress', direction)
 	}
 
-	const checkProgress = () => _progress > 200 && triggerSwipe()
+	const checkProgress = () => _distance >= distanceThreshold && triggerSwipe()
 
 	//
 	// Event Handlers:
@@ -192,17 +288,16 @@ export default function detectSwipe(
 		// Is it HORIZONTAL:
 		if (abs(xVel) / abs(yVel) >= 2) {
 			// Left or Right?
-			const direction = _swiping ?? (xVel < 0 ? 'left' : 'right'),
-				progress =
-					direction === 'left' ? _lastTouch.x - x : x - _lastTouch.x
-			if (isH(direction)) progressSwipe(direction, progress)
+			const dir = _swiping ?? (xVel < 0 ? 'left' : 'right'),
+				dist = dir === 'left' ? _lastTouch.x - x : x - _lastTouch.x
+			if (isH(dir)) progressSwipe(dir, dist)
 		}
 		// Then it is VERTICAL
 		else if (abs(yVel) / abs(xVel) >= 2) {
 			// Up or Down?
-			const direction = _swiping ?? (yVel > 0 ? 'down' : 'up'),
-				progress = direction === 'up' ? _lastTouch.y - y : y - _lastTouch.y
-			if (isV(direction)) progressSwipe(direction, progress)
+			const dir = _swiping ?? (yVel > 0 ? 'down' : 'up'),
+				dist = dir === 'up' ? _lastTouch.y - y : y - _lastTouch.y
+			if (isV(dir)) progressSwipe(dir, dist)
 		}
 
 		_lastTouch = { x, y, timestamp }
@@ -229,10 +324,15 @@ export default function detectSwipe(
 	observer.observe(el)
 	resetState(true)
 
-	debug(() => _swiped, 'SWIPED')
-	debug(() => _swiping, 'SWIPING')
-	debug(() => _progress, 'PROGRESS')
-	debug(() => JSON.stringify(_allowSides))
+	// debug(() => _swiped, 'SWIPED')
+	// debug(() => _swiping, 'SWIPING')
+	// debug(() => _distance, 'PROGRESS')
+	// debug(() => JSON.stringify(_allowSides))
+
+	return {
+		on,
+		off,
+	}
 }
 
 let debug_index = 0

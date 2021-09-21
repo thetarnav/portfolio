@@ -4,6 +4,13 @@ import DefaultLayout from '../layouts/default.astro'
 ---
 
 <DefaultLayout title="Home">
+<div class="debug debug-group">
+	<div class="debug debug-left"></div>
+	<div class="debug debug-right"></div>
+	<div class="debug debug-up"></div>
+	<div class="debug debug-down"></div>
+</div>
+
 <main id="fullpage">
 	<section>
 	<h1>
@@ -36,6 +43,36 @@ section {
 	}
 	&:nth-of-type(3) {
 		@apply bg-gray-400 h-[150vh];
+	}
+}
+
+.debug {
+	@apply fixed bg-red-500;
+	transition-property: width, height;
+	transition-duration: 200ms;
+
+	&-group {
+		--up: 0px;
+		--down: 0px;
+		--left: 0px;
+		--right: 0px;
+	}
+
+	&-left {
+		@apply right-0 top-[50vh] h-12;
+		width: var(--left);
+	}
+	&-right {
+		@apply left-0 top-[50vh] h-12;
+		width: var(--right);
+	}
+	&-up {
+		@apply bottom-0 left-[50vw] w-12;
+		height: var(--up);
+	}
+	&-down {
+		@apply top-0 left-[50vw] w-12;
+		height: var(--down);
 	}
 }
 </style>
