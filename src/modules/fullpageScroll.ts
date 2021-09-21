@@ -14,13 +14,21 @@ function main() {
 
 	const { on, off } = detectSwipe(container.children[1])
 
-	const unsub = on('progress', ({ direction, capedDistance }) => {
+	const unsub = on('progress', ({ direction, capedDistance, progress }) => {
 		// console.table(a)
 		// unsub()
 		debugGroup.style.setProperty('--' + direction, capedDistance + 'px')
+		debugGroup.classList.toggle('debug-swipe', progress >= 1)
+		// progress >= 1
+		// 	? debugGroup.classList.add('debug-swipe')
+		// 	: debugGroup.classList.remove('debug-swipe')
 	})
 
 	on('swipe', ({ direction }) =>
+		debugGroup.style.setProperty('--' + direction, '0px'),
+	)
+
+	on('cancel', ({ direction }) =>
 		debugGroup.style.setProperty('--' + direction, '0px'),
 	)
 }

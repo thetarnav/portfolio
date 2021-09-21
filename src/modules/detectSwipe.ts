@@ -5,7 +5,7 @@ import { clamp, debounce, mapValues, mergeWith, omit, throttle } from 'lodash'
 
 type SwipeDirection = 'up' | 'down' | 'left' | 'right'
 
-type EventType = 'swipe' | 'progress'
+type EventType = 'swipe' | 'progress' | 'cancel'
 
 type EventCallback = (details: {
 	type: EventType
@@ -43,6 +43,12 @@ interface Position {
 interface Bounds extends Position {
 	width: number
 	height: number
+}
+
+interface TouchInfo {
+	x: number
+	y: number
+	time: number
 }
 
 interface ReturnValue {
@@ -111,6 +117,34 @@ const getBoundsReached = (
 ): { [key in keyof Position]: boolean } =>
 	mapValues(poz, n => isClose(n, 0, threshold))
 
+const getTouchInfo = (e: TouchEvent): TouchInfo => {
+	const { timeStamp: time, touches } = e,
+		{ clientX: x, clientY: y } = touches[0]
+	return { time, x, y }
+}
+
+const calcVel = (
+	nFrom: number,
+	nTo: number,
+	timeFrom: number,
+	timeTo: number,
+) => (nTo - nFrom) / (timeTo - timeFrom)
+
+const calcTouchChange = (
+	from: TouchInfo,
+	to: TouchInfo,
+): {
+	xVel: number
+	yVel: number
+	xMove: number
+	yMove: number
+} => ({
+	xVel: calcVel(from.x, to.x, from.time, to.time),
+	yVel: calcVel(from.y, to.y, from.time, to.time),
+	xMove: to.x - from.x,
+	yMove: to.y - from.y,
+})
+
 //
 // ACTIONS:
 //
@@ -121,7 +155,8 @@ export default function detectSwipe(
 ): ReturnValue {
 	//
 	// Data:
-	const distanceThreshold = 250
+	const distanceThreshold = 250,
+		resetTimeout = 300
 
 	const privateListeners: Function[] = []
 	let publicListeners: {
@@ -136,7 +171,7 @@ export default function detectSwipe(
 		_distance = 0,
 		_swiping: SwipeDirection | null = null,
 		_swiped: SwipeDirection | null = null,
-		_lastTouch = { x: 0, y: 0, timestamp: 0 }
+		_lastTouch = { x: 0, y: 0, time: 0 }
 
 	const observer = new IntersectionObserver(
 		([entry]) => (_onScreen = entry.isIntersecting),
@@ -218,14 +253,19 @@ export default function detectSwipe(
 		console.log('SWIPE', _swiping)
 		emit('swipe', _swiped)
 
-		setTimeout(() => resetState(true), 500)
+		setTimeout(updateNewBounds, resetTimeout)
 	}
 
-	const resetState = (setAllowed = false) => {
+	const resetSwipeState = () => {
+		const direction = _swiping
 		_swiping = null
 		_swiped = null
 		_distance = 0
-		if (!setAllowed) return
+		direction && emit('cancel', direction)
+	}
+
+	const updateNewBounds = () => {
+		resetSwipeState()
 		const relPoz = relativePosition(el, container),
 			boundsReached = getBoundsReached(relPoz, 50)
 		_allowSides = toSwipeDir(boundsReached)
@@ -241,7 +281,7 @@ export default function detectSwipe(
 			!_allowSwipe ||
 			(!_allowSides[direction] && _swiping !== direction)
 		)
-			return resetState()
+			return resetSwipeState()
 
 		_distance += distance
 		if (!_swiping) {
@@ -260,27 +300,24 @@ export default function detectSwipe(
 
 	const onWheel = (e: WheelEvent) => {
 		_allowSwipe = isElementInPath(e, el)
-		const swipeDir = _swiping ?? (e.deltaY > 0 ? 'up' : 'down'),
-			progressMade = abs(e.deltaY)
+		const direction = _swiping ?? (e.deltaY > 0 ? 'up' : 'down'),
+			distance = abs(e.deltaY)
 
-		progressSwipe(swipeDir, progressMade, e)
+		progressSwipe(direction, distance, e)
 		checkProgress()
 	}
 
 	const onTouchStart = (e: TouchEvent) => {
-		const { timeStamp: timestamp, touches } = e,
-			{ clientX: x, clientY: y } = touches[0]
-		_lastTouch = { x, y, timestamp }
+		_lastTouch = getTouchInfo(e)
 		_allowSwipe = isElementInPath(e, el)
 	}
 
 	const onTouchMove = (e: TouchEvent) => {
 		if (!_allowSwipe) return
 
-		const { timeStamp: timestamp, touches } = e,
-			{ clientX: x, clientY: y } = touches[0],
-			xVel = (x - _lastTouch.x) / (timestamp - _lastTouch.timestamp),
-			yVel = (y - _lastTouch.y) / (timestamp - _lastTouch.timestamp)
+		const touch = getTouchInfo(e),
+			{ xVel, yVel, xMove, yMove } = calcTouchChange(_lastTouch, touch)
+		_lastTouch = touch
 
 		// // Is it fast?
 		// if (abs(xVel) < 1 && abs(yVel) < 1) return resetState()
@@ -288,28 +325,26 @@ export default function detectSwipe(
 		// Is it HORIZONTAL:
 		if (abs(xVel) / abs(yVel) >= 2) {
 			// Left or Right?
-			const dir = _swiping ?? (xVel < 0 ? 'left' : 'right'),
-				dist = dir === 'left' ? _lastTouch.x - x : x - _lastTouch.x
-			if (isH(dir)) progressSwipe(dir, dist)
+			const direction = _swiping ?? (xVel < 0 ? 'left' : 'right'),
+				distance = direction === 'left' ? -xMove : xMove
+			if (isH(direction)) progressSwipe(direction, distance)
 		}
 		// Then it is VERTICAL
 		else if (abs(yVel) / abs(xVel) >= 2) {
 			// Up or Down?
-			const dir = _swiping ?? (yVel > 0 ? 'down' : 'up'),
-				dist = dir === 'up' ? _lastTouch.y - y : y - _lastTouch.y
-			if (isV(dir)) progressSwipe(dir, dist)
+			const direction = _swiping ?? (yVel > 0 ? 'down' : 'up'),
+				distance = direction === 'up' ? -yMove : yMove
+			if (isV(direction)) progressSwipe(direction, distance)
 		}
-
-		_lastTouch = { x, y, timestamp }
 	}
 
 	const onTouchEnd = () => {
 		checkProgress()
-		setTimeout(() => resetState(true), 100)
+		setTimeout(updateNewBounds, resetTimeout)
 	}
 
 	const onScroll = () => {
-		resetState(true)
+		updateNewBounds()
 	}
 
 	//
@@ -319,15 +354,10 @@ export default function detectSwipe(
 	listen('touchstart', onTouchStart)
 	listen('touchmove', throttle(onTouchMove, 50), { passive: false })
 	listen('touchend', onTouchEnd)
-	listen('scroll', debounce(onScroll, 200))
+	listen('scroll', debounce(onScroll, resetTimeout))
 
 	observer.observe(el)
-	resetState(true)
-
-	// debug(() => _swiped, 'SWIPED')
-	// debug(() => _swiping, 'SWIPING')
-	// debug(() => _distance, 'PROGRESS')
-	// debug(() => JSON.stringify(_allowSides))
+	updateNewBounds()
 
 	return {
 		on,

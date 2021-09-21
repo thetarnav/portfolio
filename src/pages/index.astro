@@ -47,8 +47,8 @@ section {
 }
 
 .debug {
-	@apply fixed bg-red-500;
-	transition-property: width, height;
+	@apply fixed bg-yellow-500;
+	transition-property: width, height, background-color;
 	transition-duration: 200ms;
 
 	&-group {
@@ -56,6 +56,10 @@ section {
 		--down: 0px;
 		--left: 0px;
 		--right: 0px;
+
+		&.debug-swipe .debug {
+			@apply bg-green-500;
+		} 
 	}
 
 	&-left {
