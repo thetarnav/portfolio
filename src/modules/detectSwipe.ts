@@ -155,8 +155,10 @@ export default function detectSwipe(
 ): ReturnValue {
 	//
 	// Data:
-	const distanceThreshold = 250,
-		resetTimeout = 300
+	const minDistance = 250,
+		resetTimeout = 300,
+		boundsMargin = 50,
+		minSpeed = 0
 
 	const privateListeners: Function[] = []
 	let publicListeners: {
@@ -177,7 +179,7 @@ export default function detectSwipe(
 		([entry]) => (_onScreen = entry.isIntersecting),
 		{
 			root: container instanceof Window ? document : container,
-			rootMargin: '-30px',
+			rootMargin: `-${boundsMargin}px`,
 		},
 	)
 
@@ -186,14 +188,11 @@ export default function detectSwipe(
 
 	const off: Unsubscribe = (
 		type: EventType,
-		direction: SwipeDirection,
+		dir: SwipeDirection,
 		handler: EventCallback,
 	): void => {
 		publicListeners = publicListeners.filter(
-			i =>
-				i.type !== type ||
-				i.direction !== direction ||
-				i.handler !== handler,
+			i => i.type !== type || i.direction !== dir || i.handler !== handler,
 		)
 	}
 
@@ -202,12 +201,14 @@ export default function detectSwipe(
 		a: SwipeDirection | EventCallback,
 		b?: EventCallback,
 	): CookedUnsubscribe => {
+		// args: (type: EventType, a: EventCallback)
 		if (typeof a === 'function') {
 			const handler = a as EventCallback
 			const directions: SwipeDirection[] = ['up', 'down', 'left', 'right']
 			const offs = directions.map(direction => on(type, direction, handler))
 			return () => offs.forEach(f => f())
 		}
+		// args: (type: EventType, a: SwipeDirection, b: EventCallback)
 		const direction = a
 		const handler = b as EventCallback
 		publicListeners.push({ type, direction, handler })
@@ -229,9 +230,9 @@ export default function detectSwipe(
 	}
 
 	const emit = (type: EventType, direction: SwipeDirection): void => {
-		const progress = valToP(_distance, 0, distanceThreshold),
+		const progress = valToP(_distance, 0, minDistance),
 			capedProgress = clamp(progress, 0, 1),
-			capedDistance = clamp(_distance, 0, distanceThreshold)
+			capedDistance = clamp(_distance, 0, minDistance)
 		publicListeners.forEach(
 			i =>
 				i.type === type &&
@@ -250,9 +251,7 @@ export default function detectSwipe(
 	const triggerSwipe = () => {
 		if (!_swiping) return
 		_swiped = _swiping
-		console.log('SWIPE', _swiping)
 		emit('swipe', _swiped)
-
 		setTimeout(updateNewBounds, resetTimeout)
 	}
 
@@ -267,33 +266,25 @@ export default function detectSwipe(
 	const updateNewBounds = () => {
 		resetSwipeState()
 		const relPoz = relativePosition(el, container),
-			boundsReached = getBoundsReached(relPoz, 50)
+			boundsReached = getBoundsReached(relPoz, boundsMargin)
 		_allowSides = toSwipeDir(boundsReached)
 	}
 
-	const progressSwipe = (
-		direction: SwipeDirection,
-		distance: number,
-		e?: Event,
-	) => {
-		if (
-			_swiped ||
-			!_allowSwipe ||
-			(!_allowSides[direction] && _swiping !== direction)
-		)
+	const progressSwipe = (dir: SwipeDirection, dist: number, e?: Event) => {
+		if (_swiped || !_allowSwipe || (!_allowSides[dir] && _swiping !== dir))
 			return resetSwipeState()
 
-		_distance += distance
+		_distance += dist
 		if (!_swiping) {
-			_swiping = direction
+			_swiping = dir
 			_allowSides = getDefaultAllow()
 		}
 		if (e?.cancelable) e.preventDefault()
 
-		emit('progress', direction)
+		emit('progress', dir)
 	}
 
-	const checkProgress = () => _distance >= distanceThreshold && triggerSwipe()
+	const checkProgress = () => _distance >= minDistance && triggerSwipe()
 
 	//
 	// Event Handlers:
@@ -319,22 +310,22 @@ export default function detectSwipe(
 			{ xVel, yVel, xMove, yMove } = calcTouchChange(_lastTouch, touch)
 		_lastTouch = touch
 
-		// // Is it fast?
-		// if (abs(xVel) < 1 && abs(yVel) < 1) return resetState()
+		// Is it fast?
+		if (abs(xVel) < minSpeed && abs(yVel) < minSpeed) return resetSwipeState()
 
 		// Is it HORIZONTAL:
 		if (abs(xVel) / abs(yVel) >= 2) {
 			// Left or Right?
-			const direction = _swiping ?? (xVel < 0 ? 'left' : 'right'),
-				distance = direction === 'left' ? -xMove : xMove
-			if (isH(direction)) progressSwipe(direction, distance)
+			const dir = _swiping ?? (xVel < 0 ? 'left' : 'right'),
+				dist = dir === 'left' ? -xMove : xMove
+			if (isH(dir)) progressSwipe(dir, dist)
 		}
 		// Then it is VERTICAL
 		else if (abs(yVel) / abs(xVel) >= 2) {
 			// Up or Down?
-			const direction = _swiping ?? (yVel > 0 ? 'down' : 'up'),
-				distance = direction === 'up' ? -yMove : yMove
-			if (isV(direction)) progressSwipe(direction, distance)
+			const dir = _swiping ?? (yVel > 0 ? 'down' : 'up'),
+				dist = dir === 'up' ? -yMove : yMove
+			if (isV(dir)) progressSwipe(dir, dist)
 		}
 	}
 
@@ -363,29 +354,4 @@ export default function detectSwipe(
 		on,
 		off,
 	}
-}
-
-let debug_index = 0
-function debug(f: () => any, label = '') {
-	const body = document.querySelector('body')
-	if (!(body instanceof HTMLElement)) return
-
-	const el = document.createElement('pre')
-	el.style.position = 'fixed'
-	el.style.pointerEvents = 'none'
-	el.style.top = 20 * debug_index + 'px'
-	body.prepend(el)
-
-	let prev = f()
-	label &&= label + ': '
-
-	const display = () => {
-		const now = f()
-		if (prev !== now) el.innerHTML = label + f()
-		prev = now
-		requestAnimationFrame(display)
-	}
-	requestAnimationFrame(display)
-
-	debug_index++
 }
