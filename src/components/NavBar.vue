@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-
+// @ts-ignore
+import CarbonMenu from '~icons/carbon/menu'
 </script>
 
 <template>
@@ -10,9 +11,7 @@
       </div>
       <div class="right-group">
          <button>contact</button>
-         <button class="icon-only">
-            <carbon-menu />
-         </button>
+         <Button :icon="CarbonMenu" />
       </div>
    </nav>
 </template>
@@ -29,6 +28,6 @@ nav {
    @apply flex items-center space-x-4;
 }
 .icon-only {
-   @apply w-10 h-10 center-child border border-light-100;
+   @apply border border-light-100;
 }
 </style>
