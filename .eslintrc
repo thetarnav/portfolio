@@ -13,6 +13,10 @@
     "no-mixed-spaces-and-tabs": "off",
     "quote-props": "off",
     "yml/no-tab-indent": "off",
-    "vue/singleline-html-element-content-newline": "off"
+    "vue/singleline-html-element-content-newline": "off",
+    "import/first": "warn",
+    "quotes": "off",
+    "no-trailing-spaces": "off",
+    "comma-dangle": "off"
   }
 }

@@ -2,6 +2,7 @@
 import { ViteSSG } from 'vite-ssg'
 import generatedRoutes from 'virtual:generated-pages'
 import { setupLayouts } from 'virtual:generated-layouts'
+// @ts-ignore
 import App from './App.vue'
 
 // windicss layers

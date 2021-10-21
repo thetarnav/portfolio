@@ -1,15 +1,42 @@
 @import "./markdown.scss";
 
+:root {
+	@apply font-sans;
+	font-size: 18px;
+}
+
 html,
 body,
 #app {
-	height: 100%;
-	margin: 0;
-	padding: 0;
+	@apply h-full m-0 p-0;
 }
 
 html.dark {
 	background: #121212;
+}
+
+h1 {
+	@apply h1;
+}
+h2 {
+	@apply h2;
+}
+h3 {
+	@apply h3;
+}
+h4 {
+	@apply h4;
+}
+h5 {
+	@apply h5;
+}
+h6 {
+	@apply h6;
+}
+
+code,
+.prose pre code {
+	@apply font-mono;
 }
 
 #nprogress {

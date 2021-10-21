@@ -16,9 +16,7 @@ const go = () => {
 		<p class="text-4xl">
 			<carbon-campsite class="inline-block" />
 		</p>
-		<p>
-			<a rel="noreferrer" href="https://github.com/antfu/vitesse" target="_blank">Vitesse</a>
-		</p>
+		<h2>Vitesse</h2>
 		<p>
 			<em class="text-sm opacity-75">Hello, this is descripton</em>
 		</p>
