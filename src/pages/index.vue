@@ -12,37 +12,44 @@ const go = () => {
 </script>
 
 <template>
-	<div>
-		<p class="text-4xl">
-			<carbon-campsite class="inline-block" />
-		</p>
-		<h2>Vitesse</h2>
-		<p>
-			<em class="text-sm opacity-75">Hello, this is descripton</em>
-		</p>
-
-		<div class="py-4" />
-
-		<input
-			id="input"
-			v-model="name"
-			placeholder="What's your name?"
-			aria-label="What's your name?"
-			type="text"
-			autocomplete="false"
-			p="x-4 y-2"
-			w="250px"
-			text="center"
-			bg="transparent"
-			border="~ rounded gray-200 dark:gray-700"
-			outline="none active:none"
-			@keydown.enter="go"
-		/>
-		<label class="hidden" for="input">What's your name?</label>
-
-		<div>
-			<button class="m-3 text-sm btn" :disabled="!name" @click="go">Go</button>
+	<div m="t-14">
+		<div
+			class="relative mx-auto w-24 h-24 p-3 flex flex-col items-center rounded-full bg-dark-700 text-white"
+		>
+			<glyphs-logo class="w-full h-full" />
+			<h6 class="absolute h6 top-full -mt-3">thetarnav</h6>
 		</div>
+	</div>
+	<div class="flex justify-between">
+		<div m="t-4">
+			<p>Hey, I am</p>
+			<h3 text="white">
+				Damian
+				<br />Tarnawski,
+			</h3>
+		</div>
+		<div class="mt-12 text-right">
+			<p>a passionate</p>
+			<h3 text="white">
+				Designer
+				<br />& Web Dev
+			</h3>
+		</div>
+	</div>
+	<div m="t-8 x-2">
+		<p
+			h="max-24"
+			class="overflow-hidden"
+			style="mask-image: linear-gradient(black 40%, transparent)"
+		>Dreaming up ideas, architecting how would they look and function is where my passion lies. I’m especially interested in unique design systems, improving user experience, and making open source projects for fellow developers.</p>
+		<a class="font-medium underline">Read more about me.</a>
+	</div>
+	<div m="x-2 t-8">
+		<p>I’m available for hire/cooperation.</p>
+		<button>
+			Contact Me
+			<carbon:chat />
+		</button>
 	</div>
 </template>
 

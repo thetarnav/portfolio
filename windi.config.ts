@@ -53,6 +53,7 @@ export default defineConfig({
 		},
 	},
 	shortcuts: {
+		'center-child': 'flex justify-center items-center',
 		h1: 'font-display font-bold text-4xl',
 		h2: 'font-display font-bold text-3xl',
 		h3: 'font-display font-bold text-2xl',

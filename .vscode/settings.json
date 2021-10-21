@@ -31,4 +31,7 @@
   },
   "scss.validate": false,
   "css.validate": false,
+  "vite.buildCommand": "pnpm run build",
+  "vite.devCommand": "pnpm dev",
+  "vite.port": 3000,
 }
