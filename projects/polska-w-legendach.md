@@ -1,5 +1,8 @@
 ---
 title: Polska w Legendach
+card:
+   image: 'https://res.cloudinary.com/thetarnav/image/upload/v1634933532/portfolio/polska-w-legendach/card_zfiqbg.png'
+   shadow: '#F7CF4C'
 ---
 
 # The Goal
@@ -10,4 +13,4 @@ From a common dream to its implementation, through tragedy, to glory - our poste
 
 # From zero to a Hero
 
-Legends place special emphasis on the stories of people whose obsession has become a constant struggle with challenges surrunding them, achieving deserved glory - we also wanted the work to focus on the appeling storeis of heros and their achievements, not limited to a simple interpretation. 
+Legends place special emphasis on the stories of people whose obsession has become a constant struggle with challenges surrunding them, achieving deserved glory - we also wanted the work to focus on the appeling storeis of heros and their achievements, not limited to a simple interpretation.

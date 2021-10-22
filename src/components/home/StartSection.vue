@@ -29,7 +29,7 @@ import CarbonChat from '~icons/carbon/chat'
             </h3>
          </div>
       </header>
-      <div m="t-8 x-2">
+      <div m="t-10 x-2">
          <p
             h="max-24"
             class="overflow-hidden"

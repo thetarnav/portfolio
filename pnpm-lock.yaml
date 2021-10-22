@@ -12,6 +12,7 @@ specifiers:
   '@vue/server-renderer': ^3.2.20
   '@vueuse/core': ^6.7.3
   '@vueuse/head': ^0.6.0
+  colord: ^2.9.1
   critters: ^0.0.10
   cross-env: ^7.0.3
   fs-extra: ^10.0.0
@@ -46,6 +47,7 @@ specifiers:
 dependencies:
   '@vueuse/core': 6.7.3_vue@3.2.20
   '@vueuse/head': 0.6.0_vue@3.2.20
+  colord: 2.9.1
   nprogress: 0.2.0
   pinia: 2.0.0-rc.14_typescript@4.4.4+vue@3.2.20
   prism-theme-vars: 0.2.2
@@ -746,6 +748,10 @@ packages:
   /color-name/1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
     dev: true
+
+  /colord/2.9.1:
+    resolution: {integrity: sha512-4LBMSt09vR0uLnPVkOUBnmxgoaeN4ewRbx801wY/bXcltXfpR/G46OdWn96XpYmCWuYvO46aBZP4NgX8HpNAcw==}
+    dev: false
 
   /combined-stream/1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}

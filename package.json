@@ -10,6 +10,7 @@
   "dependencies": {
     "@vueuse/core": "^6.7.3",
     "@vueuse/head": "^0.6.0",
+    "colord": "^2.9.1",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.0-rc.14",
     "prism-theme-vars": "^0.2.2",

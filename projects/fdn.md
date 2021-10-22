@@ -1,5 +1,10 @@
 ---
 title: For Science Foundation
+card:
+   background: '#ffffff'
+   image: 'https://res.cloudinary.com/thetarnav/image/upload/v1634934297/portfolio/fdn/card_kgkkk4.png'
+   foreground: 'https://res.cloudinary.com/thetarnav/image/upload/v1634933083/portfolio/fdn/fdn-phones_mnvjz7.png'
+   shadow: '#189AD3'
 ---
 
 # The Client
