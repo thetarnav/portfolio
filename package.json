@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@vueuse/core": "^6.4.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "overswipe": "0.0.0-beta.1"
   },
   "devDependencies": {
     "@astrojs/renderer-vue": "^0.1.8",
