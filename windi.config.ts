@@ -3,7 +3,7 @@ import { defineConfig } from 'windicss/helpers'
 import typography from 'windicss/plugin/typography'
 
 export default defineConfig({
-	darkMode: 'class',
+	darkMode: false,
 	// https://windicss.org/posts/v30.html#attributify-mode
 	attributify: true,
 	plugins: [
@@ -54,9 +54,9 @@ export default defineConfig({
 	},
 	shortcuts: {
 		'center-child': 'flex justify-center items-center',
-		h1: 'font-display font-bold text-4xl',
+		h1: 'font-display font-bold text-4xl uppercase font-extrabold',
 		h2: 'font-display font-bold text-3xl',
-		h3: 'font-display font-bold text-2xl',
+		h3: 'font-display font-bold text-2xl leading-6',
 		h4: 'font-display font-bold text-xl',
 		h5: 'font-display font-bold text-lg',
 		h6: 'font-display font-bold text-base',

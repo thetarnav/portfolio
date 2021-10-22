@@ -1,6 +1,6 @@
 <template>
 	<NavBar />
-	<main class="m-4">
+	<main class="p-4 overflow-hidden">
 		<router-view />
 	</main>
 	<Footer />

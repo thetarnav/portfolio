@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build": "cross-env NODE_ENV=production vite-ssg build",
-    "dev": "vite --port 3000 --open --host",
+    "dev": "vite --port 3000 --host",
     "preview": "vite preview",
     "preview-https": "serve dist",
     "typecheck": "vue-tsc --noEmit"
