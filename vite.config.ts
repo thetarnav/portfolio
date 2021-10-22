@@ -1,5 +1,6 @@
-import path from 'path'
+import { resolve } from 'path'
 import { defineConfig } from 'vite'
+import fs from 'fs-extra'
 import Vue from '@vitejs/plugin-vue'
 import Pages from 'vite-plugin-pages'
 import Layouts from 'vite-plugin-vue-layouts'
@@ -12,6 +13,7 @@ import Markdown from 'vite-plugin-md'
 import WindiCSS from 'vite-plugin-windicss'
 import Inspect from 'vite-plugin-inspect'
 import Prism from 'markdown-it-prism'
+import matter from 'gray-matter'
 import LinkAttributes from 'markdown-it-link-attributes'
 
 const markdownWrapperClasses = 'prose prose-sm m-auto text-left'
@@ -19,7 +21,7 @@ const markdownWrapperClasses = 'prose prose-sm m-auto text-left'
 export default defineConfig({
 	resolve: {
 		alias: {
-			'~/': `${path.resolve(__dirname, 'src')}/`,
+			'~/': `${resolve(__dirname, 'src')}/`,
 		},
 	},
 	plugins: [
@@ -30,6 +32,21 @@ export default defineConfig({
 		// https://github.com/hannoeru/vite-plugin-pages
 		Pages({
 			extensions: ['vue', 'md'],
+			pagesDir: [{ dir: 'projects', baseRoute: '/projects' }, './src/pages'],
+			extendRoute(route) {
+				const path = resolve(__dirname, route.component.slice(1))
+
+				// add frontmatter to route meta for project files
+				if (route.path.includes('/projects')) {
+					const md = fs.readFileSync(path, 'utf-8')
+					const { data } = matter(md)
+					route.meta = Object.assign(route.meta || {}, {
+						frontmatter: data,
+					})
+				}
+
+				return route
+			},
 		}),
 
 		// https://github.com/JohnCampionJr/vite-plugin-vue-layouts
@@ -37,12 +54,7 @@ export default defineConfig({
 
 		// https://github.com/antfu/unplugin-auto-import
 		AutoImport({
-			imports: [
-				'vue',
-				'vue-router',
-				'@vueuse/head',
-				'@vueuse/core',
-			],
+			imports: ['vue', 'vue-router', '@vueuse/head', '@vueuse/core'],
 			dts: 'src/auto-imports.d.ts',
 		}),
 
@@ -61,9 +73,7 @@ export default defineConfig({
 				IconsResolver({
 					componentPrefix: '',
 					enabledCollections: ['carbon', 'mdi'],
-					customCollections: [
-						'glyphs'
-					]
+					customCollections: ['glyphs'],
 				}),
 			],
 			dts: 'src/components.d.ts',
@@ -73,8 +83,8 @@ export default defineConfig({
 		Icons({
 			autoInstall: true,
 			customCollections: {
-				'glyphs': FileSystemIconLoader('./icons'),
-			}
+				glyphs: FileSystemIconLoader('./icons'),
+			},
 		}),
 
 		// https://github.com/antfu/vite-plugin-windicss
@@ -85,6 +95,7 @@ export default defineConfig({
 		// https://github.com/antfu/vite-plugin-md
 		// Don't need this? Try vitesse-lite: https://github.com/antfu/vitesse-lite
 		Markdown({
+			wrapperComponent: 'project-post',
 			wrapperClasses: markdownWrapperClasses,
 			headEnabled: true,
 			markdownItSetup(md) {
@@ -120,14 +131,7 @@ export default defineConfig({
 	},
 
 	optimizeDeps: {
-		include: [
-			'vue',
-			'vue-router',
-			'@vueuse/core',
-			'@vueuse/head',
-		],
-		exclude: [
-			'vue-demi',
-		],
+		include: ['vue', 'vue-router', '@vueuse/core', '@vueuse/head'],
+		exclude: ['vue-demi'],
 	},
 })

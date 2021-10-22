@@ -41,7 +41,7 @@ onMounted(() => {
    }
 }
 .static-title {
-   @apply transition-base duration-700;
+   @apply transition-base duration-700 text-gray-100;
    &.hide {
       @apply opacity-0 transform -translate-x-24;
    }
