@@ -3,7 +3,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production vite-ssg build",
     "dev": "vite --port 3000 --host",
-    "preview": "vite preview",
+    "preview": "vite preview --port 3000 --host",
     "preview-https": "serve dist",
     "typecheck": "vue-tsc --noEmit"
   },
@@ -14,6 +14,7 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.0.0-rc.14",
     "prism-theme-vars": "^0.2.2",
+    "swiper": "^7.0.9",
     "vue": "^3.2.20",
     "vue-demi": "^0.11.4",
     "vue-router": "^4.0.12"

@@ -42,6 +42,7 @@ export default defineConfig({
 					const { data } = matter(md)
 					route.meta = Object.assign(route.meta || {}, {
 						frontmatter: data,
+						layout: 'overlay',
 					})
 				}
 

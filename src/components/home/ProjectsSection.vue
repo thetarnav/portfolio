@@ -1,10 +1,13 @@
 <script lang="ts" setup>
 import { ProjectCardData } from './ProjectCard.vue'
+import { Pagination, Swiper as SwiperInstance } from 'swiper';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import 'swiper/css';
 
-const defaultProps = () => ({
+const defaultProps = {
    title: 'Project',
    background: '#eee',
-})
+}
 
 const router = useRouter()
 // use frontmatter data in route meta to create projects list
@@ -13,36 +16,58 @@ const projects: ProjectCardData[] = router
    .filter(
       i => i.path.startsWith('/projects') && Object.keys(i.meta).length !== 0,
    )
-   .map(route => {
+   .map((route, i) => {
       const frontmatter = route.meta.frontmatter as
          | undefined
          | Record<string, any>
-      if (!frontmatter) return defaultProps()
+      const id = String(route.name ?? i)
+      if (!frontmatter) return { id, ...defaultProps }
       const { title, card } = frontmatter
       return {
-         title: title || defaultProps().title,
-         background: card?.background || defaultProps().background,
+         id,
+         title: title || defaultProps.title,
+         background: card?.background || defaultProps.background,
          image: card?.image,
          foreground: card?.foreground,
          shadow: card?.shadow,
       }
    })
+
+// swiper init
+const onSwiper = (swiper: SwiperInstance) => {
+   console.log(swiper);
+};
+const onSlideChange = () => {
+   console.log('slide change');
+};
 </script>
 
 <template>
    <section id="projects-section" class="min-h-screen">
-      <ProjectsHeader p="t-12" />
-      <ul class="space-y-4">
-         <li v-for="(project, i) in projects" :key="i">
-            <ProjectCard
-               :title="project.title"
-               :background="project.background"
-               :image="project.image"
-               :foreground="project.foreground"
-               :shadow="project.shadow"
-            />
-         </li>
-      </ul>
+      <ProjectsHeader p="t-12" m="b-6" />
+      <swiper
+         class="-mx-4 overflow-visible"
+         slides-per-view="auto"
+         :space-between="70"
+         :pagination="{ clickable: true }"
+         @swiper="onSwiper"
+         @slideChange="onSlideChange"
+      >
+         <swiper-slide v-for="project in projects" :key="project.id">
+            <div
+               class="w-screen h-[calc(100vh-14rem)] px-4 flex flex-col justify-center items-stretch"
+            >
+               <ProjectCard
+                  :id="project.id"
+                  :title="project.title"
+                  :background="project.background"
+                  :image="project.image"
+                  :foreground="project.foreground"
+                  :shadow="project.shadow"
+               />
+            </div>
+         </swiper-slide>
+      </swiper>
    </section>
 </template>
 
