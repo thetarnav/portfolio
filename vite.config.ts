@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import fs from 'fs-extra'
 import Vue from '@vitejs/plugin-vue'
-import Pages from 'vite-plugin-pages'
+import Pages, { Route } from 'vite-plugin-pages'
 import Layouts from 'vite-plugin-vue-layouts'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
@@ -15,8 +15,54 @@ import Inspect from 'vite-plugin-inspect'
 import Prism from 'markdown-it-prism'
 import matter from 'gray-matter'
 import LinkAttributes from 'markdown-it-link-attributes'
+import { colord } from 'colord'
+import type { ProjectData } from '~/types'
 
 const markdownWrapperClasses = 'prose prose-sm m-auto text-left'
+
+const extendRoute = (route: Route): Route => {
+	const path = resolve(__dirname, route.component.slice(1))
+
+	// add frontmatter to route meta for project files
+	if (route.path.includes('/projects')) {
+		const defaultTitle = 'Project',
+			defaultBackground = '#eee'
+
+		const md = fs.readFileSync(path, 'utf-8')
+		const { data: frontmatter } = matter(md)
+		const id = String(route.name ?? route.path)
+
+		route.meta = Object.assign(route.meta || {}, {
+			layout: 'overlay',
+		})
+
+		if (!frontmatter) {
+			const data: ProjectData = {
+				id,
+				title: defaultTitle,
+				background: defaultBackground,
+			}
+			route.meta.data = data
+		} else {
+			// use frontmatter data in route meta to create projects list
+			const { title, card } = frontmatter
+			const data: ProjectData = {
+				id,
+				title: title || defaultTitle,
+				background: card?.background || defaultBackground,
+				image: card?.image,
+				foreground: card?.foreground,
+				// turn color value from project post to rgba, with applied transparency
+				shadow: card?.shadow
+					? colord(card.shadow).alpha(0.3).toRgbString()
+					: undefined,
+			}
+			route.meta.data = data
+		}
+	}
+
+	return route
+}
 
 export default defineConfig({
 	resolve: {
@@ -33,21 +79,7 @@ export default defineConfig({
 		Pages({
 			extensions: ['vue', 'md'],
 			pagesDir: [{ dir: 'projects', baseRoute: '/projects' }, './src/pages'],
-			extendRoute(route) {
-				const path = resolve(__dirname, route.component.slice(1))
-
-				// add frontmatter to route meta for project files
-				if (route.path.includes('/projects')) {
-					const md = fs.readFileSync(path, 'utf-8')
-					const { data } = matter(md)
-					route.meta = Object.assign(route.meta || {}, {
-						frontmatter: data,
-						layout: 'overlay',
-					})
-				}
-
-				return route
-			},
+			extendRoute,
 		}),
 
 		// https://github.com/JohnCampionJr/vite-plugin-vue-layouts

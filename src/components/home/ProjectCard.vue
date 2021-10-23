@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import { colord } from 'colord'
-import { isClient } from '@vueuse/core'
-
 export interface ProjectCardData {
    id: string
    title: string
@@ -11,10 +8,7 @@ export interface ProjectCardData {
    shadow?: string
 }
 
-const { shadow } = defineProps<ProjectCardData>()
-
-// turn color value from project post to rgba, with applied transparency
-const shadowColor = shadow ? colord(shadow).alpha(0.3).toRgbString() : undefined
+defineProps<ProjectCardData>()
 </script>
 
 <template>
@@ -34,8 +28,8 @@ const shadowColor = shadow ? colord(shadow).alpha(0.3).toRgbString() : undefined
             class="absolute -inset-6 bg-contain bg-no-repeat"
          ></div>
       </div>
-      <figcaption class="mt-3 pb-2 text-light-100 border-b" :style="`border-color: ${shadowColor}`">
-         <h3 :style="`color: ${shadow}`">{{ title }}</h3>
+      <figcaption class="mt-3 pb-2 text-light-100 border-b" :style="`border-color: ${shadow}`">
+         <h3>{{ title }}</h3>
       </figcaption>
       <p class="text-xs text-warm-gray-600">{{ id }}</p>
    </figure>
@@ -44,10 +38,10 @@ const shadowColor = shadow ? colord(shadow).alpha(0.3).toRgbString() : undefined
 <style lang="scss" scoped>
 .card {
    &.withBackgroundImage img {
-      filter: drop-shadow(0 0 15px v-bind(shadowColor));
+      filter: drop-shadow(0 0 15px v-bind(shadow));
    }
    &:not(.withBackgroundImage) {
-      box-shadow: 0 0 15px v-bind(shadowColor);
+      box-shadow: 0 0 15px v-bind(shadow);
    }
 }
 </style>

@@ -2,12 +2,10 @@
 import { ProjectCardData } from './ProjectCard.vue'
 import { Pagination, Swiper as SwiperInstance } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/vue';
-import 'swiper/css';
 
-const defaultProps = {
-   title: 'Project',
-   background: '#eee',
-}
+import type { ProjectData } from '~/types'
+
+import 'swiper/css';
 
 const router = useRouter()
 // use frontmatter data in route meta to create projects list
@@ -16,22 +14,7 @@ const projects: ProjectCardData[] = router
    .filter(
       i => i.path.startsWith('/projects') && Object.keys(i.meta).length !== 0,
    )
-   .map((route, i) => {
-      const frontmatter = route.meta.frontmatter as
-         | undefined
-         | Record<string, any>
-      const id = String(route.name ?? i)
-      if (!frontmatter) return { id, ...defaultProps }
-      const { title, card } = frontmatter
-      return {
-         id,
-         title: title || defaultProps.title,
-         background: card?.background || defaultProps.background,
-         image: card?.image,
-         foreground: card?.foreground,
-         shadow: card?.shadow,
-      }
-   })
+   .map(route => ((route.meta.data ?? {}) as ProjectData))
 
 // swiper init
 const onSwiper = (swiper: SwiperInstance) => {
