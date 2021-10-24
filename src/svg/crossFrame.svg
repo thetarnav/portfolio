@@ -1,0 +1,10 @@
+<svg
+   class="w-full h-full border border-current"
+   preserveAspectRatio="none"
+   viewBox="0 0 480 300"
+   fill="none"
+   xmlns="http://www.w3.org/2000/svg"
+>
+   <path d="M0 0L480 300" stroke="currentColor" />
+   <path d="M480 0L9.29832e-06 300" stroke="currentColor" />
+</svg>

@@ -118,7 +118,7 @@ export default defineConfig({
 		Icons({
 			autoInstall: true,
 			customCollections: {
-				glyphs: FileSystemIconLoader('./icons'),
+				glyphs: FileSystemIconLoader('./src/svg'),
 			},
 		}),
 

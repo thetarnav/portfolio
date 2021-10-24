@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useUserStore } from '~/stores/user'
-import StartSection from '~/components/home/StartSection.vue'
-import ProjectsSection from '~/components/home/ProjectsSection.vue'
+import Ending from '~/components/home/Ending.vue'
 
 const user = useUserStore()
 const name = ref(user.savedName)
@@ -16,7 +15,7 @@ const go = () => {
 <template>
 	<StartSection />
 	<ProjectsSection />
-	<h1>Let’s Collaborate</h1>
+	<Ending />
 </template>
 
 <route lang="yaml">
