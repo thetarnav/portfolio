@@ -1,15 +1,21 @@
 <script setup lang="ts">
-// https://github.com/vueuse/head
-// you can use this to manipulate the document head in any components,
-// they will be rendered correctly in the html results with vite-ssg
 useHead({
-  title: 'Vitesse',
-  meta: [
-    { name: 'description', content: 'Opinionated Vite Starter Template' },
-  ],
+	title: 'thetarnav — Web Dev & Design',
+	meta: [
+		{
+			name: 'description',
+			content:
+				"Hi, I'm Damian Tarnawski, a passionate Designer & Web developer. Check out my projects and book your own!",
+		},
+		{
+			name: 'keywords',
+			content:
+				'web dev, development, design, ui, ux, portfolio, vue, for hire, developer, typescript',
+		},
+	],
 })
 </script>
 
 <template>
-  <router-view />
+	<router-view />
 </template>

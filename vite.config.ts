@@ -23,7 +23,7 @@ const markdownWrapperClasses = 'prose prose-sm m-auto text-left'
 const extendRoute = (route: Route): Route => {
 	const path = resolve(__dirname, route.component.slice(1))
 
-	// add frontmatter to route meta for project files
+	// extend project routes
 	if (route.path.includes('/projects')) {
 		const defaultTitle = 'Project',
 			defaultBackground = '#eee'
@@ -32,11 +32,13 @@ const extendRoute = (route: Route): Route => {
 		const { data: frontmatter } = matter(md)
 		const id = String(route.name ?? route.path)
 
+		// add layout to all routes in /projects folder
 		route.meta = Object.assign(route.meta || {}, {
 			layout: 'overlay',
 		})
 
 		if (!frontmatter) {
+			// if frontmatter doesn't exist, instert default values
 			const data: ProjectData = {
 				id,
 				title: defaultTitle,
@@ -44,7 +46,7 @@ const extendRoute = (route: Route): Route => {
 			}
 			route.meta.data = data
 		} else {
-			// use frontmatter data in route meta to create projects list
+			// use route frontmatter to create project data
 			const { title, card } = frontmatter
 			const data: ProjectData = {
 				id,

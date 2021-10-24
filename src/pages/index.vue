@@ -16,6 +16,7 @@ const go = () => {
 <template>
 	<StartSection />
 	<ProjectsSection />
+	<h1>Let’s Collaborate</h1>
 </template>
 
 <route lang="yaml">
