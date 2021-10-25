@@ -1,6 +1,7 @@
 <script setup lang="ts">
 //@ts-ignore
 import CarbonChat from '~icons/carbon/chat'
+import SocialIconLink1 from '../common/SocialIconLink.vue';
 </script>
 
 <template>
@@ -41,12 +42,8 @@ import CarbonChat from '~icons/carbon/chat'
          <p>I’m available for hire/cooperation.</p>
          <div m="t-2" class="flex items-center space-x-4 text-gray-100">
             <Button :icon-right="CarbonChat" class="bg-red-600">Contact Me</Button>
-            <a href="https://github.com/thetarnav" target="_blank">
-               <carbon:logo-github class="w-8 h-8" />
-            </a>
-            <a href="https://behance.net/damiantarnawski" target="_blank">
-               <mdi:behance class="w-8 h-8" />
-            </a>
+            <SocialIconLink1 type="github" class="w-8 h-8" />
+            <SocialIconLink1 type="behance" class="w-8 h-8" />
          </div>
       </div>
    </section>
