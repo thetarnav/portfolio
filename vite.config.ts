@@ -25,12 +25,17 @@ const extendRoute = (route: Route): Route => {
 
 	// extend project routes
 	if (route.path.includes('/projects')) {
-		const defaultTitle = 'Project',
-			defaultBackground = '#eee'
+		const id = String(route.name ?? route.path)
+		const defaultProject: ProjectData = {
+			id,
+			title: 'Project',
+			background: '#eee',
+			year: new Date(Date.now()).getFullYear(),
+			tags: [],
+		}
 
 		const md = fs.readFileSync(path, 'utf-8')
 		const { data: frontmatter } = matter(md)
-		const id = String(route.name ?? route.path)
 
 		// add layout to all routes in /projects folder
 		route.meta = Object.assign(route.meta || {}, {
@@ -39,25 +44,22 @@ const extendRoute = (route: Route): Route => {
 
 		if (!frontmatter) {
 			// if frontmatter doesn't exist, instert default values
-			const data: ProjectData = {
-				id,
-				title: defaultTitle,
-				background: defaultBackground,
-			}
-			route.meta.data = data
+			route.meta.data = defaultProject
 		} else {
 			// use route frontmatter to create project data
-			const { title, card } = frontmatter
+			const { title, card, year, tags } = frontmatter
 			const data: ProjectData = {
 				id,
-				title: title || defaultTitle,
-				background: card?.background || defaultBackground,
+				title: title || defaultProject.title,
+				background: card?.background || defaultProject.background,
 				image: card?.image,
 				foreground: card?.foreground,
 				// turn color value from project post to rgba, with applied transparency
 				shadow: card?.shadow
 					? colord(card.shadow).alpha(0.3).toRgbString()
 					: undefined,
+				year: year || defaultProject.year,
+				tags: tags || defaultProject.tags,
 			}
 			route.meta.data = data
 		}

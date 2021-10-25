@@ -1,5 +1,9 @@
 ---
 title: Polska w Legendach
+year: 2018
+tags:
+   - featured
+   - graphic
 card:
    image: 'https://res.cloudinary.com/thetarnav/image/upload/v1634933532/portfolio/polska-w-legendach/card_zfiqbg.png'
    shadow: '#F7CF4C'

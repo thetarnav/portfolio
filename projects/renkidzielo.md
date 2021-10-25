@@ -1,5 +1,12 @@
 ---
 title: Handcrafted Branding for a Handcraft Company
+year: 2019
+tags:
+   - featured
+   - commercial
+   - ux
+   - ui
+   - dev
 card:
    background: '#fffdfa'
    image: 'https://res.cloudinary.com/thetarnav/image/upload/v1634997331/portfolio/renkidzielo/hero_fmor7f.png'

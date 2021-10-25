@@ -41,14 +41,7 @@ const onSlideChange = () => {
       >
          <swiper-slide v-for="project in projects" :key="project.id">
             <div class="w-screen px-4 flex flex-col justify-center items-stretch">
-               <ProjectCard
-                  :id="project.id"
-                  :title="project.title"
-                  :background="project.background"
-                  :image="project.image"
-                  :foreground="project.foreground"
-                  :shadow="project.shadow"
-               />
+               <ProjectCard :data="project" />
             </div>
          </swiper-slide>
       </swiper>
