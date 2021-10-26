@@ -6,9 +6,7 @@ export default defineConfig({
 	darkMode: false,
 	// https://windicss.org/posts/v30.html#attributify-mode
 	attributify: true,
-	plugins: [
-		typography(),
-	],
+	plugins: [typography()],
 	theme: {
 		extend: {
 			zIndex: {
@@ -43,7 +41,7 @@ export default defineConfig({
 			},
 			transitionProperty: {
 				'clip-path': 'clip-path',
-				'base': 'opacity, transform',
+				base: 'opacity, transform',
 			},
 		},
 		fontFamily: {
@@ -51,6 +49,9 @@ export default defineConfig({
 			display: "'Syne', 'Epilogue', 'Poppins', sans-serif",
 			mono: "'Fira Code', monospace",
 		},
+		// fontSize: {
+		// 	base: '1.125rem',
+		// },
 	},
 	shortcuts: {
 		'center-child': 'flex justify-center items-center',

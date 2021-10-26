@@ -25,7 +25,7 @@ onUnmounted(() => { clearTimeout(timeout); lastAnimation?.stop() })
 </script>
 
 <template>
-   <section class="mt-16">
+   <section class="mt-24">
       <h1 text="light-200">Let’s Collab&shy;orate</h1>
       <div w="58" m="t-8 x-auto">
          <p>
