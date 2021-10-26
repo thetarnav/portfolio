@@ -11,6 +11,7 @@ export type ProjectTag =
 	| 'ux'
 	| 'graphic'
 	| 'dev'
+	| 'branding'
 
 export interface ProjectData {
 	id: string

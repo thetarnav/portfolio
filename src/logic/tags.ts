@@ -11,6 +11,7 @@ const tagMap: Record<ProjectTag, { glyph: GlyphName; color: string }> = {
 	ux: { glyph: 'ux', color: '#2EC4B6' },
 	graphic: { glyph: 'picture', color: '#F86624' },
 	dev: { glyph: 'code', color: '#88DB2B' },
+	branding: { glyph: 'best', color: '#7E2BDB' },
 }
 
 const getTagMeta = (tag: ProjectTag): { glyph: GlyphName; color: string } =>

@@ -7,6 +7,7 @@ tags:
    - ux
    - ui
    - dev
+   - branding
 card:
    background: '#fffdfa'
    image: 'https://res.cloudinary.com/thetarnav/image/upload/v1634997331/portfolio/renkidzielo/hero_fmor7f.png'
