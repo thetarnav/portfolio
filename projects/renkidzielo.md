@@ -4,7 +4,6 @@ year: 2019
 tags:
    - featured
    - commercial
-   - ux
    - ui
    - dev
    - branding

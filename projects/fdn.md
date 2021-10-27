@@ -4,7 +4,6 @@ year: 2018
 tags:
    - featured
    - commercial
-   - ux
    - ui
    - dev
 card:
