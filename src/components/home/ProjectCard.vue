@@ -35,17 +35,22 @@ const { id, background, image, foreground, shadow, title, year, tags } =
 
 		<div
 			:style="{ 'background-color': background }"
-			class="card relative rounded-md"
+			class="card relative"
 			:class="{ withBackgroundImage: !!image }"
 		>
-			<img v-if="image" :src="image" class="rounded-md" />
+			<img v-if="image" :src="image" />
 			<div v-else class="h-64"></div>
 			<div
 				v-if="foreground"
 				:style="{
 					'background-image': `url('${foreground}')`,
 				}"
-				class="absolute -inset-6 bg-contain bg-no-repeat"
+				class="
+					absolute
+					-inset-6
+					bg-contain bg-no-repeat
+					pointer-events-none
+				"
 			></div>
 		</div>
 		<figcaption
@@ -55,7 +60,7 @@ const { id, background, image, foreground, shadow, title, year, tags } =
 			<h3>{{ title }}</h3>
 		</figcaption>
 
-		<div class="-mt-px flex justify-end space-x-2">
+		<div class="-mt-px mr-2 flex justify-end space-x-2">
 			<div
 				v-for="tag in tags"
 				:key="tag"

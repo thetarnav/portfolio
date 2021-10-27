@@ -19,7 +19,8 @@
     "swiper": "^7.0.9",
     "vue": "^3.2.20",
     "vue-demi": "^0.11.4",
-    "vue-router": "^4.0.12"
+    "vue-router": "^4.0.12",
+    "copy-text-to-clipboard": "^3.0.1"
   },
   "devDependencies": {
     "@iconify-json/carbon": "^1.0.7",
